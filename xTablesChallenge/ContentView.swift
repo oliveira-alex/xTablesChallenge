@@ -10,8 +10,6 @@ import SwiftUI
 struct SettingsView: View {
     var body: some View {
         VStack(spacing: 20) {
-            Spacer()
-            
             VStack {
                 Text("Which tables do you want to practice?")
 
@@ -41,7 +39,7 @@ struct SettingsView: View {
             }
             
             VStack {
-                Text("How many questions do you want to be asked?")
+                Text("How many questions do you want to anwer?")
                 
                 HStack {
                     ForEach(0 ..< 3) {
@@ -56,14 +54,6 @@ struct SettingsView: View {
                     }
                 }
             }
-            
-            Spacer()
-            
-            Button("Start") {
-                //
-            }
-            
-            Spacer()
         }
     }
 }
@@ -76,32 +66,43 @@ struct GamingView: View {
     
     var body: some View {
         VStack(spacing: 20) {
-            Spacer()
-            
             Text("What is 7 x 8 ?")
                 .font(.title)
             
             TextField("Answer", text: $answerTxt)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding(.horizontal, 150)
-            
-            Spacer()
-            
-            Button("Submit") {
-                //
-            }
-            
-            Spacer()
         }
     }
 }
 
 struct ContentView: View {
+    @State private var isGameActive = false
+    
     var body: some View {
         NavigationView {
-//            SettingsView()
-            GamingView()
-                .navigationBarTitle("xTables")
+            VStack(spacing: 20) {
+                Spacer()
+                
+                if isGameActive {
+                    GamingView()
+                        .transition(.slide)
+                } else {
+                    SettingsView()
+                        .transition(.slide)
+                }
+                
+                Spacer()
+                
+                Button(isGameActive ? "Submit" : "Start") {
+                    withAnimation(.easeOut) {
+                        self.isGameActive.toggle()
+                    }
+                }
+                
+                Spacer()
+            }
+            .navigationBarTitle("xTables")
         }
     }
 }
@@ -109,5 +110,7 @@ struct ContentView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
+//        SettingsView()
+//        GamingView()
     }
 }

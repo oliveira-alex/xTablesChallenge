@@ -8,31 +8,61 @@
 import SwiftUI
 
 struct SettingsView: View {
+    @State private var selectedTables: [Int] = []
+    @State private var questionsQuantity = ""
+    
     var body: some View {
         VStack(spacing: 20) {
             VStack {
                 Text("Which tables do you want to practice?")
 
                 HStack {
-                    ForEach(1 ..< 5) {
-                        Button("\($0)") {
-                            //
+                    ForEach(1 ..< 5) { num in
+                        Button(action:{
+                            if let numIndex = selectedTables.firstIndex(of: num) {
+                                // deactivated color button
+                                selectedTables.remove(at: numIndex)
+                            } else {
+                                // activated color button
+                                selectedTables.append(num)
+                            }
+                        }) {
+                           Text("\(num)")
+                            .foregroundColor(selectedTables.contains(num) ? .blue : .red)
                         }
                     }
                 }
 
                 HStack {
-                    ForEach(5 ..< 9) {
-                        Button("\($0)") {
-                            //
+                    ForEach(5 ..< 9) { num in
+                        Button(action:{
+                            if let numIndex = selectedTables.firstIndex(of: num) {
+                                // deactivated color button
+                                selectedTables.remove(at: numIndex)
+                            } else {
+                                // activated color button
+                                selectedTables.append(num)
+                            }
+                        }) {
+                           Text("\(num)")
+                            .foregroundColor(selectedTables.contains(num) ? .blue : .red)
                         }
                     }
                 }
 
                 HStack {
-                    ForEach(9 ..< 13) {
-                        Button("\($0)") {
-                            //
+                    ForEach(9 ..< 13) { num in
+                        Button(action:{
+                            if let numIndex = selectedTables.firstIndex(of: num) {
+                                // deactivated color button
+                                selectedTables.remove(at: numIndex)
+                            } else {
+                                // activated color button
+                                selectedTables.append(num)
+                            }
+                        }) {
+                           Text("\(num)")
+                            .foregroundColor(selectedTables.contains(num) ? .blue : .red)
                         }
                     }
                 }
@@ -43,15 +73,18 @@ struct SettingsView: View {
                 
                 HStack {
                     ForEach(0 ..< 3) {
-                        let buttonTitle = 5.0 * pow(2.0, Double($0))
-                        Button("\(Int(buttonTitle))") {
-                            //
+                        let buttonNumber = Int(5.0 * pow(2.0, Double($0)))
+                        let buttonTitle = String(buttonNumber)
+                        Button(buttonTitle) {
+                            self.questionsQuantity = String(buttonTitle)
                         }
+                        .foregroundColor(buttonTitle == questionsQuantity ? .blue : .red)
                     }
                     
                     Button("All") {
-                        //
+                        self.questionsQuantity = "All"
                     }
+                    .foregroundColor(questionsQuantity == "All" ? .blue : .red)
                 }
             }
         }

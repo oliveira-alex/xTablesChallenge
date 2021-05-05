@@ -55,9 +55,11 @@ struct SettingsView: View {
                         Button(action:{
                             if let numIndex = selectedTables.firstIndex(of: num) {
                                 // deactivated color button
+                                
                                 selectedTables.remove(at: numIndex)
                             } else {
                                 // activated color button
+                                
                                 selectedTables.append(num)
                             }
                         }) {
@@ -89,6 +91,9 @@ struct SettingsView: View {
             }
         }
     }
+    
+    func getSelectedTables() -> [Int] { selectedTables }
+    func getQuestionsQuantity() -> String { questionsQuantity }
 }
 
 struct GamingView: View {
@@ -109,8 +114,54 @@ struct GamingView: View {
     }
 }
 
+struct Questions {
+    let selectedTables: [Int]
+    let questionsQuantityString: String
+    
+    var questions: [(Int, Int)] {
+        let questionsQuantity: Int
+        switch questionsQuantityString {
+        case "5", "10", "20":
+            questionsQuantity = Int(questionsQuantityString)!
+        default:
+            questionsQuantity = 12 * selectedTables.count
+        }
+        
+        var completeTable: [Int] = []
+        for num in 1 ..< 13 {
+            completeTable.append(num)
+        }
+        
+        var allPossibleQuestions: [[Int]] = []
+        for _ in 0 ..< selectedTables.count {
+            allPossibleQuestions.append(completeTable)
+        }
+        
+        var questionsArray: [(Int, Int)] = []
+        for _ in 0 ..< questionsQuantity {
+            var tableIndex = -1
+            repeat {
+                tableIndex = Int.random(in: 0 ..< selectedTables.count)
+            } while (allPossibleQuestions[tableIndex].isEmpty)
+            
+            let table = selectedTables[tableIndex]
+            let multiplier = allPossibleQuestions[tableIndex].randomElement()!
+            let multiplierIndex = allPossibleQuestions[tableIndex].firstIndex(of: multiplier)!
+            allPossibleQuestions[tableIndex].remove(at: multiplierIndex)
+            
+            questionsArray.append((table, multiplier))
+        }
+        return questionsArray
+    }
+}
+
 struct ContentView: View {
     @State private var isGameActive = false
+    var settingsView = SettingsView()
+    
+    @State private var selectedTables: [Int] = []
+    @State private var questionsQuantity = ""
+    
     
     var body: some View {
         NavigationView {
@@ -121,8 +172,12 @@ struct ContentView: View {
                     GamingView()
                         .transition(.slide)
                 } else {
-                    SettingsView()
+                    settingsView
                         .transition(.slide)
+                        .onDisappear(perform: {
+                            self.selectedTables =  settingsView.getSelectedTables()
+                            self.questionsQuantity =  settingsView.getQuestionsQuantity()
+                        })
                 }
                 
                 Spacer()

@@ -134,7 +134,7 @@ struct Questions {
         
         var allPossibleQuestions: [[Int]] = []
         for _ in 0 ..< selectedTables.count {
-            allPossibleQuestions.append(completeTable)
+            allPossibleQuestions.append(completeTable.sorted())
         }
         
         var questionsArray: [(Int, Int)] = []
@@ -145,9 +145,7 @@ struct Questions {
             } while (allPossibleQuestions[tableIndex].isEmpty)
             
             let table = selectedTables[tableIndex]
-            let multiplier = allPossibleQuestions[tableIndex].randomElement()!
-            let multiplierIndex = allPossibleQuestions[tableIndex].firstIndex(of: multiplier)!
-            allPossibleQuestions[tableIndex].remove(at: multiplierIndex)
+            let multiplier = allPossibleQuestions[tableIndex].popLast()!
             
             questionsArray.append((table, multiplier))
         }

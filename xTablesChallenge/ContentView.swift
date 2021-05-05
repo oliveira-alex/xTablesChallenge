@@ -97,19 +97,44 @@ struct SettingsView: View {
 }
 
 struct GamingView: View {
+    @State private var questionTxt = ""
     @State private var answerTxt = ""
     private var aswer: Int {
         return Int(answerTxt) ?? 0
     }
     
+    @State private var randomQuestions: [(Int, Int)] = [(99, 99)]
+    @State private var currentQuestionIndex = 0
+    
     var body: some View {
         VStack(spacing: 20) {
-            Text("What is 7 x 8 ?")
+            Text(questionTxt)
                 .font(.title)
             
-            TextField("Answer", text: $answerTxt)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding(.horizontal, 150)
+            if currentQuestionIndex < randomQuestions.count {
+                TextField("Answer", text: $answerTxt)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding(.horizontal, 150)
+                
+                Text("Question \(currentQuestionIndex + 1) of \(randomQuestions.count)")
+            } else {
+                // Score
+                // Play again?
+            }
+        }
+    }
+    
+    func setQuestions(_ questionsArray: [(Int, Int)]) {
+        randomQuestions = questionsArray
+    }
+    
+    func askQuestion() {
+        currentQuestionIndex += 1
+        if currentQuestionIndex < randomQuestions.count {
+            let currentQuestion = randomQuestions[currentQuestionIndex]
+            questionTxt = "What is \(currentQuestion.0) x \(currentQuestion.1) ?"
+        } else {
+            questionTxt = "No more questions"
         }
     }
 }
@@ -156,6 +181,7 @@ struct Questions {
 struct ContentView: View {
     @State private var isGameActive = false
     var settingsView = SettingsView()
+    var gamingView = GamingView()
     
     @State private var selectedTables: [Int] = []
     @State private var questionsQuantity = ""
@@ -167,8 +193,14 @@ struct ContentView: View {
                 Spacer()
                 
                 if isGameActive {
-                    GamingView()
+                    gamingView
                         .transition(.slide)
+                        .onAppear(perform: {
+                            let questions = Questions(selectedTables: selectedTables, questionsQuantityString: questionsQuantity).questions
+                            
+                            gamingView.setQuestions(questions)
+                            gamingView.askQuestion()
+                        })
                 } else {
                     settingsView
                         .transition(.slide)

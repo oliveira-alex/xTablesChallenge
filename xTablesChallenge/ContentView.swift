@@ -12,10 +12,16 @@ struct Questions {
     let questionsQuantityString: String
     
     var questions: [(Int, Int)] {
+        guard selectedTables.count > 0 else { return [] }
+        
         let questionsQuantity: Int
         switch questionsQuantityString {
-        case "5", "10", "20":
+        case "5", "10":
             questionsQuantity = Int(questionsQuantityString)!
+        case "20" where selectedTables.count == 1: // max 12 questions if just one table is selected
+            questionsQuantity = 12
+        case "20":
+            questionsQuantity = 20
         default:
             questionsQuantity = 12 * selectedTables.count
         }
@@ -53,37 +59,79 @@ struct Questions {
 
 struct GamingView: View {
     var questionTxt: String {
-        if currentQuestionIndex < randomQuestions.count {
-            let currentQuestion = randomQuestions[currentQuestionIndex]
-            return "What is \(currentQuestion.0) x \(currentQuestion.1) ?"
-        } else {
-            return "Score"
-        }
+        let currentQuestion = randomQuestions[currentQuestionIndex]
+        return "What is \(currentQuestion.0) x \(currentQuestion.1) ?"
     }
-    @State private var answerTxt = ""
+    @State private var score = 0
+    
+    @State private var answerString = ""
     private var aswer: Int {
-        return Int(answerTxt) ?? 0
+        return Int(answerString) ?? 0
     }
     
     let randomQuestions: [(Int, Int)]
     @State private var currentQuestionIndex = 0
+    var isGameOver: Bool {
+        currentQuestionIndex >= randomQuestions.count
+    }
+    
+    @State private var showingAlert = false
+    @State private var alertTitle = ""
+    @State private var alertMsg = ""
     
     var body: some View {
         VStack(spacing: 20) {
-            Text(questionTxt)
-                .font(.title)
-            
-            if currentQuestionIndex < randomQuestions.count {
-                TextField("Answer", text: $answerTxt)
+            if !isGameOver {
+                Spacer()
+                
+                Text(questionTxt)
+                    .font(.title)
+                
+                TextField("Answer", text: $answerString)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding(.horizontal, 150)
+                    .keyboardType(.numberPad)
+                
+                Spacer()
                 
                 Button("Submit") {
-                    currentQuestionIndex += 1
+                    let answer = Int(answerString) ?? 0
+                    let currentQuestion = randomQuestions[currentQuestionIndex]
+                    let correctAnswer = currentQuestion.0 * currentQuestion.1
+                    
+                    if (answer == correctAnswer) {
+                        alertTitle = "😃👍"
+                        alertMsg = "Correct!"
+                        score += 1
+                    } else if (answer == 0) {
+                        alertTitle = "😐"
+                        alertMsg = "\(currentQuestion.0) x \(currentQuestion.1) = \(correctAnswer)"
+                    } else if (answer != correctAnswer) {
+                        alertTitle = "🥺"
+                        alertMsg = "Actually \(currentQuestion.0) x \(currentQuestion.1) = \(correctAnswer)"
+                    }
+                    showingAlert = true
                 }
                 
+                Spacer()
+                
                 Text("Question \(currentQuestionIndex + 1) of \(randomQuestions.count)")
+            } else if isGameOver {
+                Spacer()
+                
+                Text("Final Score: \(score)")
+                    .font(.title)
+                
+                Spacer()
             }
+        }
+        .alert(isPresented: $showingAlert) {
+            Alert(title: Text(alertTitle),
+                  message: Text(alertMsg),
+                  dismissButton: .default(Text("OK")) {
+                    answerString = ""
+                    currentQuestionIndex += 1
+                  })
         }
     }
 }
@@ -188,6 +236,10 @@ struct ContentView: View {
                 Spacer()
             }
             .navigationTitle("Settings")
+            .onAppear(perform: {
+                selectedTables = []
+                questionsQuantity = ""
+            })
         }
     }
 }

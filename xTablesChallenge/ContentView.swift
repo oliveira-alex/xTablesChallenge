@@ -151,56 +151,27 @@ struct ContentView: View {
                 // Tables VStack
                 VStack {
                     Text("Which tables do you want to practice?")
-
-                    HStack {
-                        ForEach(1 ..< 5) { num in
-                            Button(action:{
-                                if let numIndex = selectedTables.firstIndex(of: num) {
-                                    // deactivated color button
-                                    selectedTables.remove(at: numIndex)
-                                } else {
-                                    // activated color button
-                                    selectedTables.append(num)
+                    
+                    // Three HStacks
+                    ForEach(0 ..< 3) { line in
+                        HStack {
+                            // With four buttons in each HStack
+                            let firstButtonNumber: Int = 4 * line + 1
+                            let lastButtonNumber: Int = 4 * line + 4
+                            
+                            ForEach(firstButtonNumber ..< lastButtonNumber + 1) { buttonNumber in
+                                Button(action:{
+                                    if let numIndex = selectedTables.firstIndex(of: buttonNumber) {
+                                        // deactivated color button if it was already selected
+                                        selectedTables.remove(at: numIndex)
+                                    } else {
+                                        // activated color button if it wasn't already selected
+                                        selectedTables.append(buttonNumber)
+                                    }
+                                }) {
+                                   Text("\(buttonNumber)")
+                                    .foregroundColor(selectedTables.contains(buttonNumber) ? .blue : .red)
                                 }
-                            }) {
-                               Text("\(num)")
-                                .foregroundColor(selectedTables.contains(num) ? .blue : .red)
-                            }
-                        }
-                    }
-
-                    HStack {
-                        ForEach(5 ..< 9) { num in
-                            Button(action:{
-                                if let numIndex = selectedTables.firstIndex(of: num) {
-                                    // deactivated color button
-                                    selectedTables.remove(at: numIndex)
-                                } else {
-                                    // activated color button
-                                    selectedTables.append(num)
-                                }
-                            }) {
-                               Text("\(num)")
-                                .foregroundColor(selectedTables.contains(num) ? .blue : .red)
-                            }
-                        }
-                    }
-
-                    HStack {
-                        ForEach(9 ..< 13) { num in
-                            Button(action:{
-                                if let numIndex = selectedTables.firstIndex(of: num) {
-                                    // deactivated color button
-                                    
-                                    selectedTables.remove(at: numIndex)
-                                } else {
-                                    // activated color button
-                                    
-                                    selectedTables.append(num)
-                                }
-                            }) {
-                               Text("\(num)")
-                                .foregroundColor(selectedTables.contains(num) ? .blue : .red)
                             }
                         }
                     }

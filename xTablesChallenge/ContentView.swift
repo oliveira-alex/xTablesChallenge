@@ -112,10 +112,12 @@ struct GamingView: View {
                     }
                     showingAlert = true
                 }
+                .font(.title)
                 
                 Spacer()
                 
                 Text("Question \(currentQuestionIndex + 1) of \(randomQuestions.count)")
+                    .font(.title2)
             } else if isGameOver {
                 Spacer()
                 
@@ -169,8 +171,9 @@ struct ContentView: View {
                                         selectedTables.append(buttonNumber)
                                     }
                                 }) {
-                                   Text("\(buttonNumber)")
+                                    Text(buttonNumber < 10 ? "  \(buttonNumber)" : "\(buttonNumber)")
                                     .foregroundColor(selectedTables.contains(buttonNumber) ? .blue : .red)
+                                    .font(.title)
                                 }
                             }
                         }
@@ -186,15 +189,17 @@ struct ContentView: View {
                             let buttonNumber = Int(5.0 * pow(2.0, Double($0)))
                             let buttonTitle = String(buttonNumber)
                             Button(buttonTitle) {
-                                self.questionsQuantity = String(buttonTitle)
+                                self.questionsQuantity = buttonTitle
                             }
                             .foregroundColor(buttonTitle == questionsQuantity ? .blue : .red)
                         }
+                        .font(.title)
                         
                         Button("All") {
                             self.questionsQuantity = "All"
                         }
                         .foregroundColor(questionsQuantity == "All" ? .blue : .red)
+                        .font(.title)
                     }
                 }
                 
@@ -202,6 +207,7 @@ struct ContentView: View {
                 
                 NavigationLink(destination: GamingView(randomQuestions: questions.questions)) {
                     Text("Start")
+                        .font(.title)
                 }
                 
                 Spacer()
